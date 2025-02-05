@@ -1,0 +1,15 @@
+---
+- hosts: all  
+  become: false
+  gather_facts: no 
+  tasks: 
+    - name: download vs
+      win_chocolatey:
+        name: vscode
+        state: present
+
+    - name: download chrome
+      win_chocolatey:
+        name: googlechrome
+        state: present
+

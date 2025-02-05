@@ -1,0 +1,5 @@
+availability_zone="ap-south-1b"
+instance_type="t2.micro"
+key="roshi"
+region= "ap-south-1"
+tags="terraform-packer"

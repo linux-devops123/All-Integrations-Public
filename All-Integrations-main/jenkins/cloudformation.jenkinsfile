@@ -1,0 +1,58 @@
+node('built-in'){
+ stage('parameters'){
+ properties([
+ parameters([
+            choice(choices:['1','2','3'],description:'duration to run',name:'jenkins_pipeline')
+        ])
+        ])
+        }
+    stage('Cleanup and clone'){
+           
+            deleteDir()
+             git branch:'main', url: 'https://github.com/linux-devops123/packer.git', credentialsId:'jenkins-git-integration'
+            echo "done"
+           
+        
+        }
+      
+        stage('Packer')
+        {
+        withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'aws_jenkins',
+                    accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+
+                ]])
+                {
+            dir('packer/cloudformation')
+            {
+                sh"""
+                #!/bin/bash
+                aws cloudformation create-stack --stack-name cloudformationec2stack --template-body file://ec2.json --parameters file://ec2_vars.json
+                """
+                sleep(300)
+            }
+            }
+        }
+         stage('Packer')
+        {
+        
+        withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'aws_jenkins',
+                    accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+
+                ]]){
+            dir('packer/cloudformation')
+            {
+                sh"""
+                #!/bin/bash
+                 aws cloudformation delete-stack --stack-name cloudformationec2stack
+                """
+
+            }
+            }
+        }   
+        }

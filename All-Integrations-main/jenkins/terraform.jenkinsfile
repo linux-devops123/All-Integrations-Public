@@ -1,0 +1,147 @@
+node('built-in'){
+ stage('parameters'){
+ properties([
+ parameters([
+            choice(choices:['dev','test','prod'],description:"Environment name",name:"Enviroments")
+        ])
+        ])
+        }
+    stage('Cleanup and clone'){
+           
+            deleteDir()
+             git branch:'main', url: 'https://github.com/linux-devops123/terraform.git', credentialsId:'jenkins-git-integration'
+            echo "done"
+           script{
+                    scenario="${params.Enviroments}"
+                    }
+        
+        }
+       stage('terraform')
+        {
+        if(scenario == "prod"){
+            dir('Terraform/s3')
+    {
+        sh"""
+       terraform init
+        terraform apply -auto-approve
+        """
+        
+    }
+    }
+   
+    if(scenario == "dev"){
+       dir('Terraform/cloudwatch')
+    {
+        sh"""
+        terraform init
+        terraform apply -auto-approve
+        """
+    }
+    }
+   
+    if(scenario == "test"){
+     dir('Terraform/network-security'){
+        sh"""
+        terraform init
+        terraform apply -auto-approve
+        """
+    }
+    }
+    
+    if(scenario == "test"){
+    dir('Terraform/linux')
+    {
+       sh"""
+        terraform init
+        terraform apply -auto-approve
+        """
+        def data1 = sh(returnStdout:true, script: "terraform output ips")
+        echo "${data1}" 
+    }
+    }
+   
+    if(scenario == "prod"){
+       dir('Terraform/windows')
+    {
+       sh"""
+        terraform init
+        terraform apply -auto-approve
+        """
+        def data1 = sh(returnStdout:true, script: "terraform output awsinstanceid")
+        echo "${data1}" 
+    }
+    }
+    if(scenario == "dev"){
+ dir('Terraform/terragrunt')
+    {
+        sh"""
+        terragrunt init 
+        terragrunt apply -auto-approve
+        """
+        def data3 = sh(returnStdout:true, script: "terragrunt output awsinstanceid")
+        echo "${data3}"
+    }
+    }
+   
+        }
+       
+        stage('delete terraform'){
+        if(scenario == "prod"){
+         dir('Terraform/s3')
+    {
+        sh"""
+       terraform init
+        terraform destroy -auto-approve
+        """
+        
+    }
+    }
+    if(scenario == "dev"){
+    dir('Terraform/cloudwatch')
+    {
+        sh"""
+        terraform init
+        terraform destroy -auto-approve
+        """
+    }
+    }
+    if(scenario == "test"){
+     dir('Terraform/linux')
+    {
+       sh"""
+        terraform init
+        terraform destroy -auto-approve
+        """ 
+    }
+    }
+    if(scenario == "test"){
+    dir('Terraform/network-security'){
+        sh"""
+        terraform init
+        terraform destroy -auto-approve
+        """
+    }
+    }
+    if(scenario == "prod"){
+     dir('Terraform/windows'){
+        sh"""
+        terraform init
+        terraform destroy -auto-approve
+        """
+    }
+    }
+    if(scenario == "dev"){
+    dir('Terraform/terragrunt')
+    {
+        sh"""
+        terragrunt init 
+        terragrunt destroy -auto-approve
+        """
+    }
+    }
+    
+   
+}
+       
+}
+   

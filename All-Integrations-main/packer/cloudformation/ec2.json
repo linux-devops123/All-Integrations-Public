@@ -1,0 +1,52 @@
+
+{
+"AWSTemplateFormatVersion": "2010-09-09",
+"Description": "Build a ec2 stack with CloudFormation",
+"Parameters":{
+  "AmiData":{
+    "Description":"ami of machine",
+    "Type":"String"
+  },
+"InstanceType":{
+  "Description":"instancetype of machine",
+    "Type":"String"
+},
+"InstanceKeyPair":{
+  "Description":"keypair of machine",
+    "Type":"String"
+},
+"InstanceSecurityGroup":{
+  "Description":"securitygroup of machine",
+    "Type":"String"
+
+}
+},
+"Resources":{
+  "EC2Instance":{
+    "Type":"AWS::EC2::Instance",
+    "Properties":{
+      "ImageId":{
+        "Ref":"AmiData"
+      },
+      "InstanceType":{
+        "Ref":"InstanceType"
+      },
+      "KeyName":{
+        "Ref":"InstanceKeyPair"
+      },
+      "SecurityGroupIds":[
+        {
+          "Ref":"InstanceSecurityGroup"
+        }
+
+      ],
+      "Tags":[
+        {
+          "Key":"Name",
+          "Value":"CloudFormationInstance"
+        }
+      ]
+    }
+  }
+}
+}

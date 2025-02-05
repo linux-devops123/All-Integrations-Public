@@ -1,0 +1,14 @@
+- hosts: localhost
+  gather_facts: no
+ 
+  tasks:
+  - name: Delete EC2 instance by Ansible
+
+    ec2_instance:
+      name: "EC2-instance-Ansible"
+      state: absent
+      filters:
+        instance-state-name: running
+      region: ap-south-1
+     
+

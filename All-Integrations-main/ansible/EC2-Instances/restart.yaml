@@ -1,0 +1,13 @@
+- hosts: localhost
+  vars:
+    instance_ids:
+      - "{{ instanceid_1 }}"
+      - "{{ instanceid_2 }}"
+  
+  tasks:
+  - name: restart EC2 instance by Ansible
+    ec2_instance:
+      instance_ids: "{{ instance_ids }}"
+      state: restarted
+      region: ap-south-1
+    

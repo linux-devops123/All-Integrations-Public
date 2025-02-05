@@ -1,0 +1,115 @@
+{
+    "builders":[
+        {
+            "type": "amazon-ebs",
+            "access_key": "{{user `access_key`}}",
+            "secret_key": "{{user `secret_key`}}",
+            "region": "{{user `region`}}",
+            "ami_name": "roshi-packer ami-{{timestamp}}",
+            "source_ami":"{{user `source_ami`}}",
+            "instance_type":"{{user `instance_type`}}",
+            "communicator": "winrm",
+            "winrm_username": "Administrator",
+            "winrm_password": "Roshi123!!!",
+            "winrm_timeout": "15m",
+            "winrm_insecure": true,
+            "winrm_use_ssl": true,
+            "user_data_file": "./powershell/winrm.ps1",
+             "tags":
+            {
+            "Name": "{{user `name`}}"
+            }
+        }
+    ], 
+    "provisioners":[
+        {
+            "type":"file",
+            "source":"./powershell/ansible.ps1",
+            "destination":"C:/"
+        },
+        
+        {
+            "type": "powershell",
+            "scripts": ["./powershell/awscli.ps1"],
+            "elevated_user": "Administrator",
+            "elevated_password": "Roshi123!!!" 
+        },
+        {
+            "type": "powershell",
+            "scripts": ["./powershell/softwares.ps1"],
+            "elevated_user": "Administrator",
+            "elevated_password": "Roshi123!!!" 
+        },
+        {
+            "type": "powershell",
+            "scripts": ["./powershell/windowsscript.ps1"],
+            "elevated_user": "Administrator",
+            "elevated_password": "Roshi123!!!" 
+        }
+                     
+    ],
+    "post-processors":[
+        {  
+            "type": "manifest",
+            "output": "packerwindows.json"
+        }
+    ]
+}
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+        

@@ -1,0 +1,23 @@
+---
+- hosts: "{{serverip}}" 
+  remote_user: Administrator
+  become: false
+  gather_facts: no 
+  vars:
+    path: ""
+    serverip: ""
+    exe: ""
+  
+  tasks: 
+    - name: start the exe
+      win_shell: "{{ exe }}"
+      async: 300
+      poll: 0
+      
+      
+    - name: delete file in server
+      win_file:
+        path: "{{path}}"
+        state: absent
+
+        

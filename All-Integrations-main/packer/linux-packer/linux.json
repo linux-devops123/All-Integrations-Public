@@ -1,0 +1,46 @@
+{
+    "builders":[
+        {
+            "type": "amazon-ebs",
+            "access_key": "{{user `access_key`}}",
+            "secret_key": "{{user `secret_key`}}",
+            "region": "{{user `region`}}",
+            "ami_name": "roshi-linuxpacker ami-{{timestamp}}",
+            "source_ami":"{{user `source_ami`}}",
+            "instance_type":"{{user `instance_type`}}",
+            "ssh_username":"ubuntu",
+            "tags":
+            {
+            "Name": "{{user `name`}}"
+            }
+        }
+
+
+    ],
+    "provisioners":[
+        {
+            "type": "shell",
+            "inline": ["sleep 100"]
+        },
+        {
+            "type": "shell",
+            "script": "linux-packer/shell1.sh"
+        },
+        {
+            "type": "file",
+            "source": "linux-packer/shell2.sh",
+            "destination":"./"
+        },
+        {
+            "type": "file",
+            "source": "linux-packer/shell3.sh",
+            "destination":"./"
+        }
+    ],
+    "post-processors":[
+        {
+            "type": "manifest",
+            "output":"linux_output.json"
+        }
+    ]
+}

@@ -1,0 +1,112 @@
+node('built-in'){
+ stage('parameters'){
+ properties([
+ parameters([
+            choice(choices:['1','2','3'],description:'duration to run',name:'jenkins_pipeline')
+        ])
+        ])
+        }
+    stage('Cleanup and clone'){
+           
+            deleteDir()
+             git branch:'main', url: 'https://github.com/linux-devops123/ansible.git', credentialsId:'jenkins-git-integration'
+            echo "done"
+           
+        
+        }
+       
+        stage("Ansible"){
+            dir('ansible'){
+                    ansiblePlaybook(colorized:true,inventory:'hosts/inventory.ini',playbook:'WindowsServer/files.yaml',extraVars:["exe":"C:\\app\\WebApplication-ASP.NETCOREMVC\\bin\\Debug\\net5.0\\WebApplication-ASP.NETCOREMVC.exe","path":"C:\\data.txt"])
+                
+            }
+            withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'aws_jenkins',
+                    accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+
+                ]]){
+             dir('ansible')
+            {
+               ansiblePlaybook(colorized:true,inventory:'hosts/inventory.ini',playbook:'EC2-Instances/start.yaml',
+                    extraVars:["instance_ids":"i-0c271182bd38cb02e", "instance_ids":"i-04becc83b635f4229"],credentialsId:'aws_jenkins')
+                    sleep(100);
+            ansiblePlaybook(colorized:true,inventory:'hosts/inventory.ini',playbook:'EC2-Instances/restart.yaml',
+                    extraVars:["instance_ids":"i-0c271182bd38cb02e", "instance_ids":"i-04becc83b635f4229"],credentialsId:'aws_jenkins') 
+                    
+          ansiblePlaybook(colorized:true,inventory:'hosts/inventory.ini',playbook:'EC2-Instances/stop.yaml',
+                    extraVars:["instance_ids":"i-0c271182bd38cb02e", "instance_ids":"i-04becc83b635f4229"],credentialsId:'aws_jenkins') 
+                    sleep(100);
+         ansiblePlaybook(colorized:true,inventory:'hosts/inventory.ini',playbook:'AWSInfrastructureAnsible/ec2-ansible.yaml', credentialsId:'aws_jenkins')
+         sleep(100);
+          ansiblePlaybook(colorized:true,inventory:'hosts/inventory.ini',playbook:'AWSInfrastructureAnsible/s3.yaml', credentialsId:'aws_jenkins')
+         sleep(100);
+ 
+                
+            }
+            }
+            dir('ansible')
+            {
+            ansiblePlaybook(colorized:true,inventory:'hosts/inventory2.ini',playbook:'playbooks/handler.yaml',disableHostKeyChecking:true)
+            }
+             
+        }
+        stage('ansible+terraform')
+        {
+          dir('ansible/terraform/ubuntu')
+            {
+                
+                    sh"""
+                    terraform init
+                    terraform apply -auto-approve
+
+                    """
+                    sleep(300);
+                
+            }
+             dir('ansible/terraform/windows')
+            {
+                
+                    sh"""
+                    terraform init
+                    terraform apply -auto-approve
+
+                    """
+                    sleep(300);
+                
+            }
+         }
+         
+         stage("destroy servers")
+        {
+             dir('ansible/terraform/ubuntu')
+            {
+               
+                    sh"""
+                    terraform init
+                    terraform destroy -auto-approve
+
+                    """
+                    sleep(300);
+                
+            }
+             dir('ansible/terraform/windows')
+            {
+                
+                    sh"""
+                    terraform init
+                    terraform destroy -auto-approve
+
+                    """
+                    sleep(300);
+                
+            }
+        }
+            
+        }
+
+
+
+
+

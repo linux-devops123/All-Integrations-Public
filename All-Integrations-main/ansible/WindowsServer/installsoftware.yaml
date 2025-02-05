@@ -1,0 +1,17 @@
+---
+- hosts: all 
+  remote_user: Administrator 
+  become: false
+  gather_facts: no
+  
+  tasks:
+    - name: download softwares on server
+      win_chocolatey:
+        name: "{{ item }}"
+        state: present
+        
+      loop: 
+        - notepadplusplus
+        - visualstudio2019professional
+        - googlechrome
+

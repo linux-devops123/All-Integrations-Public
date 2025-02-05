@@ -1,0 +1,36 @@
+---
+- hosts: all
+  remote_user: root 
+  become: true
+  gather_facts: no
+  tasks: 
+  - name: Install postgresql
+    apt: 
+      name: postgresql
+      state: latest 
+    notify:
+      - Restart nginx
+    
+  - name: Install nginx
+    apt:  
+      name: nginx
+      state: latest 
+    notify: 
+      - Restart nginx
+  
+
+  - name: Remove nginx
+    apt:  
+      name: nginx
+      state: absent
+
+
+  handlers:
+  - name: Restart nginx
+    service:
+      name: nginx
+      state: restarted 
+
+ 
+  
+

@@ -1,0 +1,6 @@
+{
+    "source_ami":"ami-077d687accca02dc1",
+    "instance_type":"t2.micro",
+    "region": "ap-south-1",
+    "name": "packer"
+}

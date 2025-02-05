@@ -1,0 +1,67 @@
+node('built-in'){
+ stage('parameters'){
+ properties([
+ parameters([
+            choice(choices:['1','2','3'],description:'duration to run',name:'jenkins_pipeline')
+        ])
+        ])
+        }
+    stage('Cleanup and clone'){
+           
+            deleteDir()
+             git branch:'main', url: 'https://github.com/linux-devops123/packer.git', credentialsId:'jenkins-git-integration'
+            echo "done"
+           
+        }
+       stage('Packer')
+        {
+            dir('packer')
+            {
+                sh"""
+                #!/bin/bash
+              
+                packer build -var-file windows-packer/packer1_vars.json windows-packer/packer1.json
+                """
+                sleep(300)
+            }
+        }
+      
+        stage('packer-terraform')
+        {
+            dir('packer/Terraform+Packer')
+            {
+                sh"""
+               terraform init
+               terraform apply -auto-approve
+                """
+                def data = sh(returnStdout:true, script: "terraform output name")
+                echo "${data}"
+            }
+        }
+        stage('Packer')
+        {
+            dir('packer')
+            {
+                sh"""
+                #!/bin/bash
+                packer build -var-file linux-packer/linux_vars.json linux-packer/linux.json
+                
+                """
+                sleep(300)
+            }
+        }
+         stage('packer-terraform delete')
+        {
+            dir('packer/Terraform+Packer')
+            {
+                sh"""
+               terraform init
+               terraform destroy -auto-approve
+                """
+                def data = sh(returnStdout:true, script: "terraform output name")
+                echo "${data}"
+            }
+        }       
+        
+        }
+        

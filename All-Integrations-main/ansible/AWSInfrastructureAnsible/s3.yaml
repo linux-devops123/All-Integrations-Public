@@ -1,0 +1,12 @@
+--- 
+- hosts: localhost
+  gather_facts: no 
+
+  tasks:
+  - name: s3 by Ansible
+    aws_s3:
+      bucket: elasticbeanstalk-ap-south-1-941812274699
+      object: ansible/data.jenkinsfile
+      src: /var/jenkins_home/workspace/All/integration.jenkinsfile
+      mode: put
+      

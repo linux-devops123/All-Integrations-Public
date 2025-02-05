@@ -1,0 +1,19 @@
+[
+    {
+        "ParameterKey":"AmiData",
+        "ParameterValue":"ami-05d31464f43773244"
+    },
+    {
+        "ParameterKey":"InstanceType",
+        "ParameterValue":"t2.micro"
+    },
+    {
+        "ParameterKey":"InstanceKeyPair",
+        "ParameterValue":"roshi"
+    },
+    {
+        "ParameterKey":"InstanceSecurityGroup",
+        "ParameterValue":"sg-0ce20a821c382ed22"
+    }
+
+]

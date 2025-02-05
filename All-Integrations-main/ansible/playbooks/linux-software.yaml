@@ -1,0 +1,22 @@
+---
+- hosts: all
+  remote_user: root 
+  become: true
+  gather_facts: no
+  tasks: 
+  - name: Install nginx
+    apt: 
+      name: nginx
+      state: latest
+
+  - name: run exe in linux
+    shell: sh /home/ubuntu/shell3.sh
+    async: 300
+    poll: 0
+    register: my_output
+  - debug: 
+      var: my_output
+    
+  
+    
+   
